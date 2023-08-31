@@ -1,0 +1,75 @@
+<h2>Agregar nuevos productos</h2>
+<form id="myForm" action="">
+    <label for="title">Ingresa un título:</label>
+    <input type="text" id="title" name="title"/>
+    <br>
+    <label for="description">Descripción:</label>
+    <input type="text" id="description" name="description"/>
+    <br>
+    <label for="price">Precio:</label>
+    <input type="number" id="price" name="price"/>
+    <br>
+    <label for="thumbnail">Link a imagen:</label>
+    <input type="text" id="thumbnail" name="thumbnail"/>
+    <br>
+    <label for="code">Código:</label>
+    <input type="text" id="code" name="code"/>
+    <br>
+    <label for="stock">Stock.</label>
+    <input type="number" id="stock" name="stock"/>
+    <br>
+    <button type="submit">Enviar</button>
+</form>
+
+<h2>Eliminar un producto</h2> 
+<form id="formDelete" action="">
+    <label for="idProd">Ingresa el ID del producto que quieres eliminar:</label>
+    <input type="text" id="idProd" name="idProd"/>
+    <button type="text">Eliminar</button>
+</form>
+
+<h2>Productos en tiempo real</h2>
+<div id="newProd"></div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket=io()
+    const mostrar= document.getElementById("newProd")
+    socket.on('productList', (productosArray) => {
+        let content= ""
+    productosArray.forEach(prod=> { 
+                    content += `<div>
+                                    <h3>Producto: </h3>
+                                    <p>Título: ${prod.title}</p>
+                                    <p>Descripción: ${prod.description}</p>
+                                    <p>Precio: ${prod.price}</p>
+                                    <p>Imagen: ${prod.thumbnail}</p>
+                                    <p>Código: ${prod.code}</p>
+                                    <p>Stock: ${prod.stock}</p>
+                                    <p>ID: ${prod.id}</p>
+                                </div>
+                                <br>`})
+        mostrar.innerHTML = content
+
+        }) 
+  const formulario = document.getElementById('myForm');
+    formulario.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const price = document.getElementById("price").value;
+        const thumbnail = document.getElementById("thumbnail").value;
+        const code = document.getElementById("code").value;
+        const stock = document.getElementById("stock").value;
+        const element = {title,description,price, thumbnail,code,stock}
+        socket.emit('newProd', element)
+    }) 
+    const deleteForm = document.getElementById('formDelete')
+    deleteForm.addEventListener('submit', function(event){
+        event.preventDefault()
+        const idDelete= document.getElementById("idProd").value;
+        socket.emit('deleteProd', idDelete)
+    })
+    
+</script>
